@@ -49,7 +49,6 @@ public class SellerController extends Component implements Initializable{
 
             Class.forName("org.postgresql.Driver");
 
-
             Con = DriverManager.getConnection(
                     "jdbc:postgresql://localhost:5432/isko",
                     "postgres",
@@ -152,7 +151,6 @@ public class SellerController extends Component implements Initializable{
         }
     }
 
-
     @FXML
     public void goToSoldCars(javafx.scene.input.MouseEvent event) throws IOException {
         try {
@@ -169,7 +167,6 @@ public class SellerController extends Component implements Initializable{
             JOptionPane.showMessageDialog(null, "Failed to load Sold Cars scene.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
 
     public void goToLogin(MouseEvent mouseEvent) {
         try {

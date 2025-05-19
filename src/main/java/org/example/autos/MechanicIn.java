@@ -191,7 +191,6 @@ public class MechanicIn extends Component implements Initializable {
                 }
             }
 
-
             String insertQuery = "INSERT INTO cars (id, brand, model, body_type, trans, status, price, date) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement insertStmt = Con.prepareStatement(insertQuery)) {

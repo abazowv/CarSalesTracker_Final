@@ -39,8 +39,8 @@ public class MechanicTo implements Initializable {
 
     Connection Con;
     private ObservableList<Car> carList = FXCollections.observableArrayList();
-    private double totalSalary = 0.0; // Переменная для хранения зарплаты
-    private static final int MECHANIC_ID = 1; // ID механика (для примера)
+    private double totalSalary = 0.0;
+    private static final int MECHANIC_ID = 1;
 
     public void Connect() {
         try {
@@ -199,7 +199,6 @@ public class MechanicTo implements Initializable {
 
                 Con.setAutoCommit(false);
 
-
                 String deleteQuery = "DELETE FROM cars WHERE id = ?";
                 try (PreparedStatement deleteStmt = Con.prepareStatement(deleteQuery)) {
                     deleteStmt.setInt(1, selectedCar.getId());
@@ -208,7 +207,6 @@ public class MechanicTo implements Initializable {
                         throw new SQLException("No car found with id " + selectedCar.getId());
                     }
                 }
-
 
                 String insertQuery = "INSERT INTO serviced_cars (brand, model, body_type, trans, service_date, reason, status, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
                 int newId = 0;
@@ -229,13 +227,10 @@ public class MechanicTo implements Initializable {
                     }
                 }
 
-
                 totalSalary += 100.0;
                 updateSalary();
 
-
                 Con.commit();
-
 
                 carList.remove(selectedCar);
                 CarsTable.refresh();

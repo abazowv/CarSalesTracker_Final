@@ -45,7 +45,6 @@ public class SoldController extends Component implements Initializable{
 
             Class.forName("org.postgresql.Driver");
 
-
             Con = DriverManager.getConnection(
                     "jdbc:postgresql://localhost:5432/isko",
                     "postgres",
@@ -59,7 +58,6 @@ public class SoldController extends Component implements Initializable{
             Logger.getLogger(DirectorController.class.getName()).log(Level.SEVERE, "Database connection failed!", ex);
         }
     }
-
 
     public void DisplaySoldCars() {
         soldcarList.clear();
@@ -83,7 +81,6 @@ public class SoldController extends Component implements Initializable{
                 soldcarList.add(soldCar);
             }
 
-
             SoldTable.setItems(soldcarList);
 
         } catch (SQLException e) {
@@ -91,7 +88,6 @@ public class SoldController extends Component implements Initializable{
             JOptionPane.showMessageDialog(null, "Failed to load sold cars from database.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -134,7 +130,6 @@ public class SoldController extends Component implements Initializable{
                 tax = rs.getDouble("tax"); // Извлекаем налог
             }
 
-
             if (commission == 0.0) {
                 commission = selectedCar.getPrice() * 0.01;
             }
@@ -143,7 +138,6 @@ public class SoldController extends Component implements Initializable{
             if (tax == 0.0) {
                 tax = selectedCar.getPrice() * 0.005;
             }
-
 
             String insertQuery = "INSERT INTO cars (id, brand, model, body_type, trans, status, price, commision, tax, date) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -159,14 +153,12 @@ public class SoldController extends Component implements Initializable{
             insertStmt.setDouble(9, tax);
             insertStmt.setString(10, date);
 
-
             int rowsInserted = insertStmt.executeUpdate();
             if (rowsInserted > 0) {
                 System.out.println("Car inserted successfully into the cars table.");
             } else {
                 System.out.println("No rows inserted.");
             }
-
 
             String deleteQuery = "DELETE FROM sold_cars WHERE id = ?";
             PreparedStatement deleteStmt = Con.prepareStatement(deleteQuery);
@@ -177,7 +169,6 @@ public class SoldController extends Component implements Initializable{
             } else {
                 System.out.println("No rows deleted.");
             }
-
 
             DisplaySoldCars();
 
@@ -204,9 +195,7 @@ public class SoldController extends Component implements Initializable{
         }
     }
 
-
     public void reportBtn(ActionEvent actionEvent) {
-
 
             String query = "SELECT COUNT(*) AS total_cars, SUM(commision) AS total_commission, SUM(price) AS total_sales FROM sold_cars";
 
@@ -219,12 +208,10 @@ public class SoldController extends Component implements Initializable{
                     double totalCommission = rs.getDouble("total_commission");
                     double totalSales = rs.getDouble("total_sales");
 
-
                     String reportMessage = "Sales Report:\n\n" +
                             "Total Cars Sold: " + totalCars + "\n" +
                             "Total Commission: $" + String.format("%.2f", totalCommission) + "\n" +
                             "Total Sales: $" + String.format("%.2f", totalSales);
-
 
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Sales Report");
@@ -246,7 +233,6 @@ public class SoldController extends Component implements Initializable{
             }
         }
 
-
     public void goToLogin(MouseEvent mouseEvent) {
 
         try {
@@ -254,9 +240,7 @@ public class SoldController extends Component implements Initializable{
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));
             Parent root = fxmlLoader.load();
 
-
             Stage currentStage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
-
 
             Scene newScene = new Scene(root, 525, 428);
             currentStage.setScene(newScene);
@@ -268,7 +252,6 @@ public class SoldController extends Component implements Initializable{
 
             JOptionPane.showMessageDialog(null, "Failed to load Login scene.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
     }
 }
 
