@@ -1,36 +1,33 @@
 package org.example.autos;
 
-public class ServicedCar {
-    private int id;
-    private String brand;
-    private String model;
-    private String bodyType;
-    private String trans;
-    private String serviceDate;
-    private String reason;
-    private String status;
-    private double price; // Добавляем поле price
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+
+public class ServicedCar extends Vehicle {
+    private final SimpleStringProperty bodyType;
+    private final SimpleStringProperty trans;
+    private final SimpleStringProperty serviceDate;
+    private final SimpleStringProperty reason;
+    private final SimpleStringProperty status;
 
     public ServicedCar(int id, String brand, String model, String bodyType, String trans, String serviceDate, String reason, String status, double price) {
-        this.id = id;
-        this.brand = brand;
-        this.model = model;
-        this.bodyType = bodyType;
-        this.trans = trans;
-        this.serviceDate = serviceDate;
-        this.reason = reason;
-        this.status = status;
-        this.price = price;
+        super(id, brand, model, price);
+        this.bodyType = new SimpleStringProperty(bodyType);
+        this.trans = new SimpleStringProperty(trans);
+        this.serviceDate = new SimpleStringProperty(serviceDate);
+        this.reason = new SimpleStringProperty(reason);
+        this.status = new SimpleStringProperty(status);
     }
 
+    public String getBodyType() { return bodyType.get(); }
+    public String getTrans() { return trans.get(); }
+    public String getServiceDate() { return serviceDate.get(); }
+    public String getReason() { return reason.get(); }
+    public String getStatus() { return status.get(); }
 
-    public int getId() { return id; }
-    public String getBrand() { return brand; }
-    public String getModel() { return model; }
-    public String getBodyType() { return bodyType; }
-    public String getTrans() { return trans; }
-    public String getServiceDate() { return serviceDate; }
-    public String getReason() { return reason; }
-    public String getStatus() { return status; }
-    public double getPrice() { return price; } // Добавляем геттер для price
+    public SimpleStringProperty bodyTypeProperty() { return bodyType; }
+    public SimpleStringProperty transProperty() { return trans; }
+    public SimpleStringProperty serviceDateProperty() { return serviceDate; }
+    public SimpleStringProperty reasonProperty() { return reason; }
+    public SimpleStringProperty statusProperty() { return status; }
 }

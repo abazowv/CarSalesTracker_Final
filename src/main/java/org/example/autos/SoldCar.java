@@ -1,53 +1,25 @@
 package org.example.autos;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
 
-public class SoldCar {
-    private final SimpleIntegerProperty id;
-    private final SimpleStringProperty brand;
-    private final SimpleStringProperty model;
-    private final SimpleDoubleProperty price;
+public class SoldCar extends Vehicle {
     private final SimpleDoubleProperty tax;
-    private final SimpleDoubleProperty commision;
+    private final SimpleDoubleProperty commission; // Исправлено с "commision" на "commission"
     private final SimpleStringProperty availability;
 
     public SoldCar(int id, String brand, String model, double price, double tax, double commission, String availability) {
-        this.id = new SimpleIntegerProperty(id);
-        this.brand = new SimpleStringProperty(brand);
-        this.model = new SimpleStringProperty(model);
-        this.price = new SimpleDoubleProperty(price);
+        super(id, brand, model, price);
         this.tax = new SimpleDoubleProperty(tax);
-        this.commision = new SimpleDoubleProperty(commission);
+        this.commission = new SimpleDoubleProperty(commission);
         this.availability = new SimpleStringProperty(availability);
     }
-    public int getId() {
-        return id.get();
-    }
 
-    public String getBrand() {
-        return brand.get();
-    }
+    public double getTax() { return tax.get(); }
+    public double getCommission() { return commission.get(); } // Исправлено с "commision" на "commission"
+    public String getAvailability() { return availability.get(); }
 
-    public String getModel() {
-        return model.get();
-    }
-
-    public double getPrice() {
-        return price.get();
-    }
-
-    public double getTax() {
-        return tax.get();
-    }
-
-    public double getCommision() {
-        return commision.get();
-    }
-
-    public String getAvailability() {
-        return availability.get();
-    }
-
+    public SimpleDoubleProperty taxProperty() { return tax; }
+    public SimpleDoubleProperty commissionProperty() { return commission; } // Исправлено с "commision" на "commission"
+    public SimpleStringProperty availabilityProperty() { return availability; }
 }

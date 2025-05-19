@@ -1,21 +1,14 @@
 package org.example.autos;
 
-import javafx.fxml.Initializable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -23,13 +16,15 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 
-
-public class DirectorController extends Component implements Initializable {
+public class DirectorController implements Initializable {
     @FXML
     private TextField BrandTb;
     @FXML
@@ -79,7 +74,6 @@ public class DirectorController extends Component implements Initializable {
     Connection Con;
     private ObservableList<Car> carList = FXCollections.observableArrayList();
 
-
     public void Connect() {
         try {
             // Явная регистрация драйвера
@@ -125,7 +119,7 @@ public class DirectorController extends Component implements Initializable {
             CarsTable.setItems(carList);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(DirectorController.class.getName()).log(Level.SEVERE, "Failed to load cars from database", e);
             JOptionPane.showMessageDialog(null, "Failed to load cars from database.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -133,21 +127,20 @@ public class DirectorController extends Component implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Connect();
-        brandCol.setCellValueFactory(new PropertyValueFactory<>("brand"));
-        modelCol.setCellValueFactory(new PropertyValueFactory<>("model"));
-        bodyTypeCol.setCellValueFactory(new PropertyValueFactory<>("bodyType"));
-        transCol.setCellValueFactory(new PropertyValueFactory<>("trans"));
-        statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
+        brandCol.setCellValueFactory(cellData -> cellData.getValue().brandProperty());
+        modelCol.setCellValueFactory(cellData -> cellData.getValue().modelProperty());
+        bodyTypeCol.setCellValueFactory(cellData -> cellData.getValue().bodyTypeProperty());
+        transCol.setCellValueFactory(cellData -> cellData.getValue().transProperty());
+        statusCol.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        priceCol.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
+        dateCol.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
         DisplayCars();
     }
 
     @FXML
-    public void onTableRowSelected(javafx.scene.input.MouseEvent mouseEvent) {
+    public void onTableRowSelected(MouseEvent mouseEvent) {
         Car selectedCar = CarsTable.getSelectionModel().getSelectedItem();
         if (selectedCar != null) {
-            // Заполняем поля данными выбранной машины
             BrandTb.setText(selectedCar.getBrand());
             ModelTb.setText(selectedCar.getModel());
             TypeCmb.setValue(selectedCar.getBodyType());
@@ -158,10 +151,8 @@ public class DirectorController extends Component implements Initializable {
         }
     }
 
-
     @FXML
     public void saveBtn() {
-
         try {
             PreparedStatement add = Con.prepareStatement(
                     "INSERT INTO cars (brand, model, body_type, trans, status, price, date) " +
@@ -170,27 +161,24 @@ public class DirectorController extends Component implements Initializable {
 
             add.setString(1, BrandTb.getText());
             add.setString(2, ModelTb.getText());
-            add.setString(3, TypeCmb.getValue()); // Значение из ComboBox
-            add.setString(4, TransCmb.getValue()); // Значение из ComboBox
-            add.setString(5, StatusCmb.getValue()); // Значение из ComboBox
-            add.setDouble(6, Double.parseDouble(PriceTb.getText())); // Предполагая, что price — число
+            add.setString(3, TypeCmb.getValue());
+            add.setString(4, TransCmb.getValue());
+            add.setString(5, StatusCmb.getValue());
+            add.setDouble(6, Double.parseDouble(PriceTb.getText()));
             add.setString(7, DateTb.getText());
 
-            int k = add.executeUpdate();
+            add.executeUpdate();
             JOptionPane.showMessageDialog(null, "Car saved successfully!");
             DisplayCars();
 
         } catch (Exception e) {
+            Logger.getLogger(DirectorController.class.getName()).log(Level.SEVERE, "Failed to record", e);
             JOptionPane.showMessageDialog(null, "Failed to record", "Error", JOptionPane.ERROR_MESSAGE);
-
-            e.printStackTrace();
-
         }
-
     }
 
     @FXML
-    public void resetBtn(){
+    public void resetBtn() {
         BrandTb.setText("");
         ModelTb.setText("");
         TypeCmb.setValue(null);
@@ -216,17 +204,17 @@ public class DirectorController extends Component implements Initializable {
                 pst.setString(7, DateTb.getText());
                 pst.setInt(8, selectedCar.getId());
 
-                int k = pst.executeUpdate();
-                if (k > 0) {
+                int rowsUpdated = pst.executeUpdate();
+                if (rowsUpdated > 0) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Update Success");
                     alert.setHeaderText(null);
                     alert.setContentText("Car updated successfully!");
                     alert.showAndWait();
                 }
-                DisplayCars(); // Обновляем таблицу
+                DisplayCars();
             } catch (SQLException e) {
-                e.printStackTrace();
+                Logger.getLogger(DirectorController.class.getName()).log(Level.SEVERE, "Failed to update car", e);
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
@@ -245,8 +233,8 @@ public class DirectorController extends Component implements Initializable {
                 PreparedStatement pst = Con.prepareStatement(query);
                 pst.setInt(1, selectedCar.getId());
 
-                int k = pst.executeUpdate();
-                if (k > 0) {
+                int rowsDeleted = pst.executeUpdate();
+                if (rowsDeleted > 0) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Delete Success");
                     alert.setHeaderText(null);
@@ -255,7 +243,7 @@ public class DirectorController extends Component implements Initializable {
                 }
                 DisplayCars();
             } catch (SQLException e) {
-                e.printStackTrace();
+                Logger.getLogger(DirectorController.class.getName()).log(Level.SEVERE, "Failed to delete car", e);
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
@@ -265,13 +253,11 @@ public class DirectorController extends Component implements Initializable {
         }
     }
 
-
     @FXML
     public void cheapBtn() {
-
         Car cheapestCar = carList.stream()
-                .min((car1, car2) -> Double.compare(car1.getPrice(), car2.getPrice()))
-                .orElse(null); // Возвращает null, если список пуст
+                .min(Comparator.comparingDouble(Car::getPrice))
+                .orElse(null);
 
         if (cheapestCar != null) {
             carList.clear();
@@ -282,9 +268,8 @@ public class DirectorController extends Component implements Initializable {
 
     @FXML
     public void expBtn() {
-
         Car expensiveCar = carList.stream()
-                .max((car1, car2) -> Double.compare(car1.getPrice(), car2.getPrice()))
+                .max(Comparator.comparingDouble(Car::getPrice))
                 .orElse(null);
 
         if (expensiveCar != null) {
@@ -295,29 +280,24 @@ public class DirectorController extends Component implements Initializable {
     }
 
     @FXML
-    public void showAllBtn(ActionEvent actionEvent) {
-        carList.clear();  // Очищаем текущий список
-        DisplayCars();    // Загружаем все машины из базы данных
+    public void showAllBtn() {
+        carList.clear();
+        DisplayCars();
         CarsTable.setItems(carList);
     }
 
+    @FXML
     public void goToLogin(MouseEvent mouseEvent) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));  // Убедитесь, что путь к файлу правильный
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));
             Parent root = fxmlLoader.load();
-
-
             Stage currentStage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
-
-
             Scene newScene = new Scene(root, 525, 458);
             currentStage.setScene(newScene);
             currentStage.setTitle("Login");
             currentStage.show();
-
         } catch (IOException e) {
-            e.printStackTrace();
-            // Показываем стандартное сообщение об ошибке в случае неудачи
+            Logger.getLogger(DirectorController.class.getName()).log(Level.SEVERE, "Failed to load Login scene", e);
             JOptionPane.showMessageDialog(null, "Failed to load Login scene.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
